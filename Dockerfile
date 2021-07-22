@@ -1,4 +1,4 @@
-FROM "ubuntu:rolling"
+FROM "ubuntu:hirsute"
 
 # Needed for string substitution
 SHELL ["/bin/bash", "-c"]
@@ -42,7 +42,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         texlive-fonts-recommended \
         r-base \
         r-base-dev \
+        sudo \
         && rm -rf /var/lib/apt/lists/*
+
+RUN adduser kunalshah sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN ln -s $(which python3) /usr/local/bin/python
 
@@ -51,6 +55,7 @@ RUN python3 -m pip --no-cache-dir install --upgrade \
     setuptools \
     wheel
 RUN python3 -m pip --no-cache-dir install --upgrade --requirement /tmp/py_reqs.txt
+RUN python -c "import nltk;nltk.download('all', download_dir='/usr/local/share/nltk_data')"
 
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
@@ -68,3 +73,5 @@ RUN apt autoremove -y
 RUN rm -rf /tmp/py_reqs.txt /tmp/rscript.R
 
 CMD [ "/bin/bash" ]
+
+
